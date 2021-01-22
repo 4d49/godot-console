@@ -9,11 +9,10 @@ var _history_index : int # Used to iterate over history.
 
 # Add string to history.
 func add_string(input: String) -> void:
-	if input.empty():
-		return
+	if input:
+		_history.append(input)
+		_history_index = _history.size()
 	
-	_history.append(input)
-	_history_index = _history.size()
 	return
 
 

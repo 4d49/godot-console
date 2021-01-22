@@ -27,12 +27,11 @@ class ConsoleOutput extends RichTextLabel:
 		return
 	
 	func _print_line(text: String, color : Color = DEFAULT_COLOR) -> void:
-		if text.empty():
-			return
+		if text:
+			self.newline()
+			self.push_color(color)
+			self.add_text(text)
 		
-		self.newline()
-		self.push_color(color)
-		self.add_text(text)
 		return
 
 

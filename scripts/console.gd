@@ -78,10 +78,9 @@ func write_command(input: String) -> void:
 
 # Print a line to the console.
 func print_line(input: String) -> void:
-	if input.empty():
-		return
+	if input:
+		emit_signal("message", input)
 	
-	emit_signal("message", input)
 	return
 
 # Return the previus console command.

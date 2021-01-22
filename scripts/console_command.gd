@@ -92,7 +92,7 @@ func execute(pool_string: PoolStringArray = []) -> String:
 
 
 func _set_name(name: String) -> void:
-	assert(not name.empty(), "Console command name cannot be empty.")
+	assert(name, "Console command name cannot be empty.")
 	_name = name
 	return
 
