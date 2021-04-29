@@ -4,11 +4,6 @@
 extends Reference
 
 
-const argBool   = preload("console_arguments.gd").argBool
-const argInt    = preload("console_arguments.gd").argInt
-const argFloat  = preload("console_arguments.gd").argFloat
-const argString = preload("console_arguments.gd").argString
-
 const BOOL   := TYPE_BOOL
 const INT    := TYPE_INT
 const FLOAT  := TYPE_REAL
@@ -52,12 +47,21 @@ func get_argument_count() -> int:
 	return _types.size()
 
 
-func get_argument_names() -> String:
-	var string : PoolStringArray
-	for type in _get_types():
-		string.append(type.get_name())
+func str2arg(string: String, type: int):
+	var value
+	match type:
+		BOOL:
+			value = bool(str2var(string))
+		INT:
+			value = int(string)
+		FLOAT:
+			value = float(string)
+		STRING:
+			value = string
+		_:
+			assert(false, "Invalid Type")
 	
-	return string.join(", ")
+	return value
 
 
 func execute(pool_string: PoolStringArray = []) -> String:
@@ -72,12 +76,7 @@ func execute(pool_string: PoolStringArray = []) -> String:
 		
 		var idx = 0
 		for type in _get_types():
-			var string = pool_string[idx]
-			
-			if not type.is_valid(string):
-				return INVALID_ARGUMENT_TYPE % get_argument_names()
-			
-			args[idx] = type.convert_string(string)
+			args[idx] = str2arg(pool_string[idx], type)
 			idx += 1
 		
 		execute_result = _get_func().call_funcv(args)
@@ -116,28 +115,7 @@ func _set_desc(desc: String) -> void:
 
 
 func _set_types(pool_types: PoolIntArray) -> void:
-	var types : Array
-	types.resize(pool_types.size())
-	
-	var idx = 0
-	for type in pool_types:
-		var arg_type
-		match type:
-			BOOL:
-				arg_type = argBool
-			INT:
-				arg_type = argInt
-			FLOAT:
-				arg_type = argFloat
-			STRING:
-				arg_type = argString
-			_:
-				assert(false, "Unsupported type.")
-		
-		types[idx] = arg_type
-		idx += 1
-	
-	_types = types
+	_types = pool_types
 	return
 
 

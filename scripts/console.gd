@@ -114,11 +114,8 @@ func _get_autocomplete() -> ConsoleAutocomplite:
 
 
 func _command_help() -> void:
-	var string : String
-	
-	var command : ConsoleCommand
 	for i in _get_commands():
-		command = _get_command(i)
+		var command = _get_command(i)
 		self.print_line(command.to_string())
 	
 	return
