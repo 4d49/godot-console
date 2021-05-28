@@ -56,24 +56,23 @@ func create_command(
 
 # Write a console command.
 func write_command(input: String) -> void:
-	if input.empty():
-		return
-	
-	_get_history().add_string(input)
-	
 	var args : PoolStringArray = input.split(" ", false)
-	var name : String = args[0]
+	if args:
+		var history = _get_history()
+		history.add_string(input)
+		
+		var name : String = args[0]
+		args.remove(0) # Remove command name from arguments.
+		
+		self.print_line("> " + input) # Print in console input string.
+		
+		if has_command(name):
+			var command = _get_command(name)
+			var output = command.execute(args)
+			self.print_line(output)
+		else:
+			self.print_line("The console command '%s' not found" % name)
 	
-	args.remove(0) # Remove command name from arguments.
-	
-	self.print_line("> " + input) # Print in console input string.
-	
-	if has_command(name):
-		var output = _get_command(name).execute(args)
-		self.print_line(output)
-		return
-	
-	self.print_line("Console command '%s' not found." % name)
 	return
 
 # Print a line to the console.
@@ -97,8 +96,8 @@ func get_autocomplete(text: String) -> String:
 
 
 func _get_command(name: String) -> ConsoleCommand:
-	assert(has_command(name), "Console command '%s' not found" % name)
-	return _get_commands().get(name)
+	var commands = _get_commands()
+	return commands[name]
 
 
 func _get_commands() -> Dictionary:
