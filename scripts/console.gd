@@ -66,7 +66,7 @@ func write_command(input: String) -> void:
 	
 	args.remove(0) # Remove command name from arguments.
 	
-	self.print_line("-> " + input) # Print in console input string.
+	self.print_line("> " + input) # Print in console input string.
 	
 	if has_command(name):
 		var output = _get_command(name).execute(args)
