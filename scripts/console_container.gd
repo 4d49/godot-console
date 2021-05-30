@@ -42,30 +42,36 @@ class ConsoleInput extends LineEdit:
 		self.caret_blink = true
 		self.placeholder_text = "Command"
 		self.clear_button_enabled = true
+		
+		self.connect("text_entered", self, "_on_text_entered")
 		return
 	
 	func _gui_input(event: InputEvent) -> void:
-		if Input.is_key_pressed(KEY_ENTER):
-			_enter_text()
-		
-		elif Input.is_key_pressed(KEY_UP):
-			set_text(Console.get_prev_command())
-		
-		elif Input.is_key_pressed(KEY_DOWN):
-			set_text(Console.get_next_command())
-		
-		elif Input.is_key_pressed(KEY_TAB):
-			set_text(Console.get_autocomplete(text))
-		
+		if event is InputEventKey and event.pressed:
+			if event.shift and event.scancode == KEY_TAB:
+				var autocomplete = Console.get_autocomplete(text)
+				set_text(autocomplete)
+				accept_event()
+			elif event.control:
+				match event.scancode:
+					KEY_UP:
+						var prev = Console.get_prev_command()
+						set_text(prev)
+					KEY_DOWN:
+						var next = Console.get_next_command()
+						set_text(next)
+					_:
+						return
+				accept_event()
 		return
 	
 	func set_text(text: String) -> void:
-		.set_text(text)
-		caret_position = text.length()
+		self.text = text
+		self.caret_position = text.length()
 		return
 	
-	func _enter_text() -> void:
-		Console.write_command(self.text)
+	func _on_text_entered(text: String) -> void:
+		Console.write_command(text)
 		self.clear()
 		return
 
