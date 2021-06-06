@@ -71,7 +71,7 @@ class ConsoleInput extends LineEdit:
 		return
 	
 	func _on_text_entered(text: String) -> void:
-		Console.write_command(text)
+		Console.enter_command(text)
 		self.clear()
 		return
 

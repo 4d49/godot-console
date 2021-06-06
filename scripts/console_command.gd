@@ -4,26 +4,83 @@
 extends Reference
 
 
-const BOOL   := TYPE_BOOL
-const INT    := TYPE_INT
-const FLOAT  := TYPE_REAL
-const STRING := TYPE_STRING
-
-const INVALID_ARGUMENT_COUNT = "Command must have %s arguments."
-const INVALID_ARGUMENT_TYPE = "Arguments must be of type: %s"
-
-
 var _name : String
-var _func : FuncRef
 var _desc : String
-var _types : Array
+
+var _object : Object
+var _method : String
+
+var _names : PoolStringArray
+var _types : PoolIntArray
 
 
-func _init(name: String, f_ref: FuncRef, desc: String = "", args: PoolIntArray = []) -> void:
+static func get_type_name(type: int) -> String:
+	match type:
+		TYPE_NIL:
+			return "null"
+		TYPE_BOOL:
+			return "bool"
+		TYPE_INT:
+			return "int"
+		TYPE_REAL:
+			return "float"
+		TYPE_STRING:
+			return "String"
+		TYPE_VECTOR2:
+			return "Vector2"
+		TYPE_RECT2:
+			return "Rect2"
+		TYPE_VECTOR3:
+			return "Vector3"
+		TYPE_TRANSFORM2D:
+			return "Transform2D"
+		TYPE_PLANE:
+			return "Plane"
+		TYPE_QUAT:
+			return "Quat"
+		TYPE_AABB:
+			return "AABB"
+		TYPE_BASIS:
+			return "Basis"
+		TYPE_TRANSFORM:
+			return "Transform"
+		TYPE_COLOR:
+			return "Color"
+		TYPE_NODE_PATH:
+			return "NodePath"
+		TYPE_RID:
+			return "RID"
+		TYPE_OBJECT:
+			return "Object"
+		TYPE_DICTIONARY:
+			return "Dictionary"
+		TYPE_ARRAY:
+			return "Array"
+		TYPE_RAW_ARRAY:
+			return "PoolByteArray"
+		TYPE_INT_ARRAY:
+			return "PoolIntArray"
+		TYPE_REAL_ARRAY:
+			return "PoolRealArray"
+		TYPE_STRING_ARRAY:
+			return "PoolStringArray"
+		TYPE_VECTOR2_ARRAY:
+			return "PoolVector2Array"
+		TYPE_VECTOR3_ARRAY:
+			return "PoolVector3Array"
+		TYPE_COLOR_ARRAY:
+			return "PoolColorArray"
+		_:
+			assert(false, "Invalid type.")
+			return ""
+
+
+func _init(name: String, desc: String, obj: Object, method: String, args: Array) -> void:
 	self._set_name(name)
-	self._set_func(f_ref)
 	self._set_desc(desc)
-	self._set_types(args)
+	self._set_object(obj)
+	self._set_method(method)
+	self._set_args(args)
 	return
 
 
@@ -36,74 +93,119 @@ func get_name() -> String:
 
 
 func get_desc() -> String:
-	return _desc
+	var desc = _desc
+	
+	if has_argument():
+		var arg_string = " Argument's: " + get_argument_string()
+		desc += arg_string
+	
+	return desc
 
 
-func has_argrument() -> bool:
-	return _types.size() > 0
+func get_object() -> Object:
+	return _object
+
+
+func get_method() -> String:
+	return _method
+
+
+func get_argument_name(index: int) -> String:
+	return _names[index]
+
+
+func get_argument_type(index: int) -> int:
+	return _types[index]
+
+
+func get_argument_string() -> String:
+	var pool : PoolStringArray = []
+	
+	for i in get_argument_count():
+		var name = get_argument_name(i)
+		var type = get_argument_type(i)
+		
+		if type:
+			var type_name = get_type_name(type)
+			pool.append(name + "(" + type_name + ")")
+		else:
+			pool.append(name)
+	
+	return pool.join(", ") + "."
+
+
+func has_argument() -> bool:
+	return not _names.empty()
 
 
 func get_argument_count() -> int:
-	return _types.size()
+	return _names.size()
 
 
-func str2arg(string: String, type: int):
-	var value
+func is_valid_argument_count(count: int) -> bool:
+	return get_argument_count() == count
+
+
+func is_valid_string(arg: String, type: int) -> bool:
 	match type:
-		BOOL:
-			value = bool(str2var(string))
-		INT:
-			value = int(string)
-		FLOAT:
-			value = float(string)
-		STRING:
-			value = string
+		TYPE_BOOL:
+			return arg == "true" or arg == "false" or arg.is_valid_integer()
+		TYPE_INT, TYPE_REAL:
+			return arg.is_valid_float()
+		TYPE_NIL, TYPE_STRING:
+			return true
 		_:
-			assert(false, "Invalid Type")
-	
-	return value
+			return false
+
+
+func convert_string(arg: String, type: int): # Return Variant.
+	match type:
+		TYPE_BOOL:
+			return bool(str2var(arg))
+		TYPE_INT, TYPE_REAL:
+			return convert(arg, type)
+		TYPE_NIL, TYPE_STRING:
+			return arg
+		_:
+			assert(false, "Invalid type.")
+			return null
 
 
 func execute(pool_string: PoolStringArray = []) -> String:
-	var execute_result # Returned value by FuncRef.
-	
-	if get_argument_count() != pool_string.size():
-		return INVALID_ARGUMENT_COUNT % get_argument_count()
-	
-	if has_argrument():
-		var args : Array
-		args.resize(get_argument_count())
+	if is_valid_argument_count(pool_string.size()):
+		var execute_result # Returned value by call method.
 		
-		var idx = 0
-		for type in _get_types():
-			args[idx] = str2arg(pool_string[idx], type)
-			idx += 1
+		var object = get_object()
+		var method = get_method()
 		
-		execute_result = _get_func().call_funcv(args)
-	else:
-		execute_result = _get_func().call_func()
-	
-	# Return result to the console if is a string.
-	if execute_result is String:
+		if has_argument():
+			var args : Array = []
+			args.resize(get_argument_count())
+			
+			for i in args.size():
+				var string = pool_string[i]
+				var type = get_argument_type(i)
+				
+				if is_valid_string(string, type):
+					var value = convert_string(string, type)
+					args[i] = value
+				else:
+					return "Invalid type of arguments: " + get_argument_string()
+			
+			execute_result = object.callv(method, args)
+		else:
+			execute_result = object.call(method)
+		
+		# Return the result to the console.
 		return execute_result
-	
-	return ""
+	else:
+		return "The command must have '%s' arguments: " % get_argument_count() + get_argument_string()
 
 
 func _set_name(name: String) -> void:
-	assert(name, "Console command name cannot be empty.")
+	assert(name, "Invalid name.")
 	_name = name
 	return
-
-
-func _set_func(func_ref: FuncRef) -> void:
-	assert(func_ref.is_valid(), "Invalid function reference.")
-	_func = func_ref
-	return
-
-
-func _get_func() -> FuncRef:
-	return _func
 
 
 func _set_desc(desc: String) -> void:
@@ -114,10 +216,29 @@ func _set_desc(desc: String) -> void:
 	return
 
 
-func _set_types(pool_types: PoolIntArray) -> void:
-	_types = pool_types
+func _set_object(object: Object) -> void:
+	assert(object, "Invalid Object")
+	_object = object
 	return
 
 
-func _get_types() -> Array:
-	return _types
+func _set_method(method: String) -> void:
+	assert(method, "Invalid Method")
+	_method = method
+	return
+
+
+func _set_args(args: Array) -> void:
+	if args:
+		var size = args.size()
+		
+		_names.resize(size)
+		_types.resize(size)
+		
+		for i in size:
+			var arg = args[i]
+			
+			_names[i] = arg.name
+			_types[i] = arg.type
+	
+	return
