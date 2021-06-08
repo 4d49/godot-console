@@ -15,44 +15,24 @@ func add_string(input: String) -> void:
 	
 	return
 
-
-func set_index(index: int) -> void:
-	if index < 0:
-		_history_index = _history.size() - 1
-	elif index > _history.size() - 1:
-		_history_index = 0
-	else:
-		_history_index = index
-	return
-
-
-func get_index() -> int:
-	return _history_index
-
 # Get the previous string from history.
 func get_prev() -> String:
-	set_index(get_index() - 1)
-	return get_string(get_index())
+	_history_index = wrapi(_history_index - 1, 0, _history.size())
+	return _get_string(_history_index)
 
 # Get the next string from history.
 func get_next() -> String:
-	set_index(get_index() + 1)
-	return get_string(get_index())
-
-# Get history string by index.
-func get_string(index: int) -> String:
-	if _history.empty():
-		return ""
-	
-	if index < 0:
-		return _history.pop_front()
-	
-	if index > _history.size() - 1:
-		return _history.pop_back()
-	
-	return _history[index]
+	_history_index = wrapi(_history_index + 1, 0, _history.size())
+	return _get_string(_history_index)
 
 
 func clear_history() -> void:
 	_history.clear()
 	return
+
+
+func _get_string(index: int) -> String:
+	if _history:
+		return _history[index]
+	
+	return ""
