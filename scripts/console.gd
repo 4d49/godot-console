@@ -22,7 +22,7 @@ var _history_index : int
 
 func _init() -> void:
 	# Built-in methods:
-	create_command("target_fps", Engine.set_target_fps, "The desired frames per second. A value of 0 means no limit.")
+	create_command("max_fps", Engine.set_max_fps, "The desired frames per second. A value of 0 means no limit.")
 	create_command("physics_ticks", Engine.set_physics_ticks_per_second, "Set physic tick per second.")
 	# Custom methods:
 	create_command("clear", clear, "Clear the console history.")
@@ -86,7 +86,8 @@ func execute(string: String) -> void:
 	print_line("[color=GRAY]> " + string + "[/color]")
 
 	if not has_command(args[0]):
-		return print_line("[color=RED]Command \"" + string + "\" not found.[/color]")
+		print_line("[color=RED]Command \"" + string + "\" not found.[/color]")
+		return
 
 	var command := get_command(args[0])
 
