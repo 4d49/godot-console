@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2022 Mansur Isaev and contributors - MIT License
+# Copyright (c) 2020-2023 Mansur Isaev and contributors - MIT License
 # See `LICENSE.md` included in the source distribution for details.
 
 ## ConsoleNode class.
@@ -59,7 +59,7 @@ func remove_command(command: String) -> bool:
 
 ## Return command.
 func get_command(command: String) -> ConsoleCommand:
-	return _command_map[command] as ConsoleCommand
+	return _command_map[command]
 
 ## Create and add a new console command.
 func create_command(command: String, callable: Callable, description := "") -> void:
@@ -75,6 +75,7 @@ func print_line(string: String) -> void:
 	printed_line.emit(string + "\n")
 
 ## Execute command. First word must be a command name, other is arguments.
+@warning_ignore("return_value_discarded")
 func execute(string: String) -> void:
 	var args : PackedStringArray = string.split(" ", false)
 	if args.is_empty():
@@ -131,6 +132,7 @@ func autocomplete_command(string: String) -> String:
 	return string
 
 ## Return a list of autocomplete commands.
+@warning_ignore("return_value_discarded")
 func autocomplete_list(string: String) -> PackedStringArray:
 	var list := PackedStringArray()
 	if string.is_empty():

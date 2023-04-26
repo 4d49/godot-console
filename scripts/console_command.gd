@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2022 Mansur Isaev and contributors - MIT License
+# Copyright (c) 2020-2023 Mansur Isaev and contributors - MIT License
 # See `LICENSE.md` included in the source distribution for details.
 
 ## Base ConsoleCommand class.
@@ -33,13 +33,14 @@ static func get_type_name(type: int) -> String:
 
 
 func _get_method_info(object: Object, method: String) -> Dictionary:
-	if object.get_script():
-		for m in object.get_script().get_script_method_list():
-			if method == m.name:
+	var script := object.get_script() as Script
+	if script:
+		for m in script.get_script_method_list():
+			if method == m["name"]:
 				return m
 
 	for m in object.get_method_list():
-		if method == m.name:
+		if method == m["name"]:
 			return m
 
 	return {}
@@ -52,22 +53,25 @@ func _init_arguments(object: Object, method: String) -> void:
 	if method_info.is_empty():
 		return
 
-	var arg_count = method_info.args.size()
+	var args : Array[Dictionary] = method_info["args"]
 
-	_arg_names.resize(arg_count)
-	_arg_types.resize(arg_count)
+	var error := _arg_names.resize(args.size())
+	assert(error == OK, error_string(error))
 
-	for i in arg_count:
-		var arg : Dictionary = method_info.args[i]
+	error = _arg_types.resize(args.size())
+	assert(error == OK, error_string(error))
 
-		assert(is_valid_type(arg.type), "Invalid argument type.")
-		if not is_valid_type(arg.type):
+	for i in args.size():
+		var arg : Dictionary = args[i]
+
+		assert(is_valid_type(arg["type"]), "Invalid argument type.")
+		if not is_valid_type(arg["type"]):
 			continue
 
-		_arg_types[i] = arg.type
+		_arg_types[i] = arg["type"]
 
-		if arg.name: # Debug build.
-			_arg_names[i] = arg.name
+		if arg["name"]: # Debug build.
+			_arg_names[i] = arg["name"]
 		else: # Release build.
 			_arg_names[i] = "arg" + str(i)
 
@@ -169,13 +173,15 @@ func execute(arguments: PackedStringArray) -> String:
 	var result = null
 	if has_argument():
 		var arg_array : Array = []
-		arg_array.resize(get_argument_count())
+
+		var error := arg_array.resize(get_argument_count())
+		assert(error == OK, error_string(error))
 
 		for i in get_argument_count():
 			var value = convert_string(arguments[i], get_argument_type(i))
 
 			if value == null:
-				return "[color=YELLOW]Invalid argument type: Cannot convert argument " + str(i + 1) + " from \"String\" to \"" + get_type_name(get_argument_type(i)) + "\".[/color]"
+				return "[color=YELLOW]Invalid argument type: Cannot convert argument " + str(i + 1) + " from \"String\" to \"" + ConsoleCommand.get_type_name(get_argument_type(i)) + "\".[/color]"
 
 			arg_array[i] = value
 

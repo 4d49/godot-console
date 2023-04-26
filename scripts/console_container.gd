@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2022 Mansur Isaev and contributors - MIT License
+# Copyright (c) 2020-2023 Mansur Isaev and contributors - MIT License
 # See `LICENSE.md` included in the source distribution for details.
 
 @tool
@@ -31,8 +31,13 @@ func _init() -> void:
 	_console_input.placeholder_text = "Command"
 	_console_input.clear_button_enabled = true
 	_console_input.editable = false
-	_console_input.text_changed.connect(set_input_text)
-	_console_input.gui_input.connect(_on_input_gui_event)
+
+	var error := _console_input.text_changed.connect(set_input_text)
+	assert(error == OK, error_string(error))
+
+	error = _console_input.gui_input.connect(_on_input_gui_event)
+	assert(error == OK, error_string(error))
+
 	self.add_child(_console_input, false, Node.INTERNAL_MODE_FRONT)
 
 	_tooltip_panel = PanelContainer.new()
@@ -52,17 +57,29 @@ func _enter_tree() -> void:
 	set_console(get_node_or_null("/root/Console"))
 
 
+func _exit_tree() -> void:
+	set_console(null)
+
+
 func set_console(console: ConsoleNode) -> void:
-	if _console == console:
+	if is_same(_console, console):
 		return
 
 	if is_instance_valid(_console):
-		_console.printed_line.disconnect(_console_output.append_text)
-		_console.cleared.disconnect(_console_output.clear)
+		if _console.printed_line.is_connected(_console_output.append_text):
+			_console.printed_line.disconnect(_console_output.append_text)
+
+		if _console.cleared.is_connected(_console_output.clear):
+			_console.cleared.disconnect(_console_output.clear)
 
 	if is_instance_valid(console):
-		console.printed_line.connect(_console_output.append_text)
-		console.cleared.connect(_console_output.clear)
+		if not console.printed_line.is_connected(_console_output.append_text):
+			var error := console.printed_line.connect(_console_output.append_text)
+			assert(error == OK, error_string(error))
+
+		if not console.cleared.is_connected(_console_output.clear):
+			var error := console.cleared.connect(_console_output.clear)
+			assert(error == OK, error_string(error))
 
 	_console = console
 	_console_input.editable = is_instance_valid(_console)
