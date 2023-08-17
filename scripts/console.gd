@@ -21,15 +21,8 @@ var _history_index : int
 
 
 func _init() -> void:
-	# Built-in methods:
-	create_command("max_fps", Engine.set_max_fps, "The desired frames per second. A value of 0 means no limit.")
-	create_command("physics_ticks", Engine.set_physics_ticks_per_second, "Set physic tick per second.")
-	# Custom methods:
 	create_command("clear", clear, "Clear the console history.")
 	create_command("help", _command_help, "Show all console command.")
-	create_command("version", _command_version, "Show engine version.")
-	create_command("test", _command_test, "Test console output.")
-	create_command("quit", _command_quit, "Quit the application.")
 
 ## Return [param true] if the console has a command.
 func has_command(command: String) -> bool:
@@ -155,15 +148,3 @@ func clear() -> void:
 func _command_help() -> void:
 	for i in get_command_list():
 		print_line(i + "- " + get_command(i).get_description())
-
-
-func _command_version() -> String:
-	return "Godot Engine {major}.{minor}.{patch}".format(Engine.get_version_info())
-
-
-func _command_test() -> String:
-	return "The quick brown fox jumps over the lazy dog."
-
-
-func _command_quit() -> void:
-	get_tree().quit()

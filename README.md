@@ -1,6 +1,6 @@
 # Godot-Console
 
-Simple in-game console for Godot 4.0.
+Simple in-game console for Godot 4.x.
 
 ![](https://user-images.githubusercontent.com/8208165/144989905-6d3eb45d-26e7-4acd-9a53-c31d7e49c400.png)
 
