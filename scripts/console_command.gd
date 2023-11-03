@@ -33,7 +33,7 @@ func _get_method_info(object: Object, method: String) -> Dictionary:
 func _init_arguments(object: Object, method: String) -> void:
 	var method_info : Dictionary = _get_method_info(object, method)
 
-	assert(method_info, "Method not found.")
+	assert(method_info, "Method \"%s\" not found." % method)
 	if method_info.is_empty():
 		return
 
@@ -48,7 +48,7 @@ func _init_arguments(object: Object, method: String) -> void:
 	for i in args.size():
 		var arg : Dictionary = args[i]
 
-		assert(is_valid_type(arg["type"]), "Invalid argument type.")
+		assert(is_valid_type(arg["type"]), "Type \"%s\" is not supported." % type_string(arg["type"]))
 		if not is_valid_type(arg["type"]):
 			continue
 
