@@ -32,7 +32,7 @@ func _init() -> void:
 	_console_input.clear_button_enabled = true
 	_console_input.editable = false
 
-	var error := _console_input.text_changed.connect(set_input_text)
+	var error := _console_input.text_changed.connect(_on_input_text_changed)
 	assert(error == OK, error_string(error))
 
 	error = _console_input.gui_input.connect(_on_input_gui_event)
@@ -90,9 +90,12 @@ func get_console() -> ConsoleNode:
 
 
 func set_input_text(text: String) -> void:
-	_console_input.text = text
-	_console_input.caret_column = text.length()
+	_console_input.set_text(text)
+	_console_input.set_caret_column(text.length())
+	_console_input.text_changed.emit(text)
 
+
+func _on_input_text_changed(text: String) -> void:
 	var autocomplete := PackedStringArray() if text.is_empty() else _console.autocomplete_list(text)
 
 	if autocomplete.is_empty():
