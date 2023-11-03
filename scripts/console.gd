@@ -54,6 +54,10 @@ func remove_command(command: String) -> bool:
 func get_command(command: String) -> ConsoleCommand:
 	return _command_map[command]
 
+## Return command description.
+func get_command_description(command: String) -> String:
+	return get_command(command).get_description()
+
 ## Create and add a new console command.
 func create_command(command: String, callable: Callable, description: String = "") -> void:
 	assert(not has_command(command), "Has command.")
@@ -146,5 +150,11 @@ func clear() -> void:
 
 
 func _command_help() -> void:
+	const TEMPLATE: String = "[cell][color=WHITE][url={0}]{0}[/url][/color][/cell][cell][color=GRAY]{1}[/color][/cell]"
+
+	var output: String = "[table=2]"
+
 	for cmd: String in get_command_list():
-		print_line(cmd + "- " + get_command(cmd).get_description())
+		output += TEMPLATE.format([cmd, get_command_description(cmd)])
+
+	print_line(output + "[/table]")

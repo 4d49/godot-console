@@ -38,6 +38,9 @@ func _init() -> void:
 	error = _console_input.gui_input.connect(_on_input_gui_event)
 	assert(error == OK, error_string(error))
 
+	error = _console_output.meta_clicked.connect(set_input_text)
+	assert(error == OK, error_string(error))
+
 	self.add_child(_console_input, false, Node.INTERNAL_MODE_FRONT)
 
 	_tooltip_panel = PanelContainer.new()
