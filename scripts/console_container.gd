@@ -54,7 +54,7 @@ func _init() -> void:
 
 
 func _enter_tree() -> void:
-	set_console(get_node_or_null("/root/Console"))
+	set_console(get_node_or_null(^"/root/Console") as ConsoleNode)
 
 
 func _exit_tree() -> void:

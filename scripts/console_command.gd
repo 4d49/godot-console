@@ -154,7 +154,7 @@ func execute(arguments: PackedStringArray) -> String:
 	if get_argument_count() != arguments.size():
 		return "[color=RED]Invalid argument count: Expected " + str(get_argument_count()) + ", received " + str(arguments.size()) + ".[/color]"
 
-	var result = null
+	var result: Variant = null
 	if has_argument():
 		var arg_array : Array = []
 
