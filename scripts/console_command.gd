@@ -15,22 +15,6 @@ var _method : StringName
 var _arg_names : PackedStringArray
 var _arg_types : PackedInt32Array
 
-## Return name of type.
-static func get_type_name(type: int) -> String:
-	match type:
-		TYPE_BOOL:
-			return "bool"
-		TYPE_INT:
-			return "int"
-		TYPE_FLOAT:
-			return "float"
-		TYPE_STRING:
-			return "String"
-		TYPE_STRING_NAME:
-			return "StringName"
-
-	return ""
-
 
 func _get_method_info(object: Object, method: String) -> Dictionary:
 	var script := object.get_script() as Script
@@ -181,7 +165,7 @@ func execute(arguments: PackedStringArray) -> String:
 			var value = convert_string(arguments[i], get_argument_type(i))
 
 			if value == null:
-				return "[color=YELLOW]Invalid argument type: Cannot convert argument " + str(i + 1) + " from \"String\" to \"" + ConsoleCommand.get_type_name(get_argument_type(i)) + "\".[/color]"
+				return "[color=YELLOW]Invalid argument type: Cannot convert argument " + str(i + 1) + " from \"String\" to \"" + type_string(get_argument_type(i)) + "\".[/color]"
 
 			arg_array[i] = value
 
