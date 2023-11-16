@@ -36,7 +36,7 @@ func _ready() -> void:
 
 With static typing, Console will try to cast arguments to a supported type.
 ```gdscript
-# Arguments is float.
+# Arguments are float.
 func teleport(x: float, y: float) -> void:
 	self.position = Vector2(x, y)
 ```
@@ -45,7 +45,7 @@ func teleport(x: float, y: float) -> void:
 
 With dynamic typing, Console will NOT cast arguments to type, and arguments will be a String.
 ```gdscript
-# Arguments is Strings.
+# Arguments are Strings.
 func teleport(x, y):
 	# Convert arguments to float.
 	self.position = Vector2(x.to_float(), y.to_float())
@@ -58,6 +58,33 @@ func add_money(value: int) -> String:
 	self.money += value
 	# Prints: Player money:42
 	return "Player money:%d" % money
+```
+
+## C# Bindings:
+
+You can add 'addons/godot-console/scripts/ConsoleMono.cs' to Autoloads after 'Console'.
+```csharp
+public partial class test : Node
+{
+
+	private void Foo(string a, string b)
+	{
+		ConsoleMono.Print(a + " " + b);
+	}
+	private static void Bar(string a, string b)
+	{
+		ConsoleMono.Print(b + " " + a);
+	}
+
+	public override void _Ready()
+	{
+		base._Ready();
+
+        	ConsoleMono.CreateCommand("foo", Foo); //You can pass method directly as delegate
+        	ConsoleMono.CreateCommand("foo2", this, MethodName.Foo); // Or you can pass target object and method name
+		//ConsoleMono.CreateCommand("bar", Bar); //Exception: method is static
+	}
+}
 ```
 
 # License
