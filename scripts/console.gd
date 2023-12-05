@@ -124,7 +124,8 @@ func autocomplete_command(string: String) -> String:
 
 	for cmd: String in get_command_list():
 		if cmd.begins_with(string):
-			return cmd
+			# A space at the end of a line for convenience.
+			return cmd + " "
 
 	return string
 
@@ -150,7 +151,7 @@ func clear() -> void:
 
 
 func _command_help() -> void:
-	const TEMPLATE: String = "[cell][color=WHITE][url={0}]{0}[/url][/color][/cell][cell][color=GRAY]{1}[/color][/cell]"
+	const TEMPLATE: String = "[cell][color=WHITE][url={0} ]{0}[/url][/color][/cell][cell][color=GRAY]{1}[/color][/cell]"
 
 	var output: String = "[table=2]"
 
