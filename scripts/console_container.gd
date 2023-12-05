@@ -32,10 +32,13 @@ func _init() -> void:
 	_console_input.clear_button_enabled = true
 	_console_input.editable = false
 
-	var error := _console_input.text_changed.connect(set_input_text)
+	var error := _console_input.text_changed.connect(_on_input_text_changed)
 	assert(error == OK, error_string(error))
 
 	error = _console_input.gui_input.connect(_on_input_gui_event)
+	assert(error == OK, error_string(error))
+
+	error = _console_output.meta_clicked.connect(set_input_text)
 	assert(error == OK, error_string(error))
 
 	self.add_child(_console_input, false, Node.INTERNAL_MODE_FRONT)
@@ -54,10 +57,16 @@ func _init() -> void:
 
 
 func _enter_tree() -> void:
-	set_console(get_node_or_null("/root/Console"))
+	var error := visibility_changed.connect(_on_visibility_changed)
+	assert(error == OK, error_string(error))
+
+	set_console(get_node_or_null(^"/root/Console") as ConsoleNode)
 
 
 func _exit_tree() -> void:
+	if visibility_changed.is_connected(_on_visibility_changed):
+		visibility_changed.disconnect(_on_visibility_changed)
+
 	set_console(null)
 
 
@@ -90,9 +99,18 @@ func get_console() -> ConsoleNode:
 
 
 func set_input_text(text: String) -> void:
-	_console_input.text = text
-	_console_input.caret_column = text.length()
+	_console_input.set_text(text)
+	_console_input.set_caret_column(text.length())
+	_console_input.text_changed.emit(text)
 
+
+func _on_visibility_changed() -> void:
+	if is_visible_in_tree():
+		_console_input.grab_focus()
+		_console_input.accept_event()
+
+
+func _on_input_text_changed(text: String) -> void:
 	var autocomplete := PackedStringArray() if text.is_empty() else _console.autocomplete_list(text)
 
 	if autocomplete.is_empty():

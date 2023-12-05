@@ -15,22 +15,6 @@ var _method : StringName
 var _arg_names : PackedStringArray
 var _arg_types : PackedInt32Array
 
-## Return name of type.
-static func get_type_name(type: int) -> String:
-	match type:
-		TYPE_BOOL:
-			return "bool"
-		TYPE_INT:
-			return "int"
-		TYPE_FLOAT:
-			return "float"
-		TYPE_STRING:
-			return "String"
-		TYPE_STRING_NAME:
-			return "StringName"
-
-	return ""
-
 
 func _get_method_info(object: Object, method: String) -> Dictionary:
 	var script := object.get_script() as Script
@@ -49,7 +33,7 @@ func _get_method_info(object: Object, method: String) -> Dictionary:
 func _init_arguments(object: Object, method: String) -> void:
 	var method_info : Dictionary = _get_method_info(object, method)
 
-	assert(method_info, "Method not found.")
+	assert(method_info, "Method \"%s\" not found." % method)
 	if method_info.is_empty():
 		return
 
@@ -64,7 +48,7 @@ func _init_arguments(object: Object, method: String) -> void:
 	for i in args.size():
 		var arg : Dictionary = args[i]
 
-		assert(is_valid_type(arg["type"]), "Invalid argument type.")
+		assert(is_valid_type(arg["type"]), "Type \"%s\" is not supported." % type_string(arg["type"]))
 		if not is_valid_type(arg["type"]):
 			continue
 
@@ -170,7 +154,7 @@ func execute(arguments: PackedStringArray) -> String:
 	if get_argument_count() != arguments.size():
 		return "[color=RED]Invalid argument count: Expected " + str(get_argument_count()) + ", received " + str(arguments.size()) + ".[/color]"
 
-	var result = null
+	var result: Variant = null
 	if has_argument():
 		var arg_array : Array = []
 
@@ -181,7 +165,7 @@ func execute(arguments: PackedStringArray) -> String:
 			var value = convert_string(arguments[i], get_argument_type(i))
 
 			if value == null:
-				return "[color=YELLOW]Invalid argument type: Cannot convert argument " + str(i + 1) + " from \"String\" to \"" + ConsoleCommand.get_type_name(get_argument_type(i)) + "\".[/color]"
+				return "[color=YELLOW]Invalid argument type: Cannot convert argument " + str(i + 1) + " from \"String\" to \"" + type_string(get_argument_type(i)) + "\".[/color]"
 
 			arg_array[i] = value
 

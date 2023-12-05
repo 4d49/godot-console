@@ -54,8 +54,12 @@ func remove_command(command: String) -> bool:
 func get_command(command: String) -> ConsoleCommand:
 	return _command_map[command]
 
+## Return command description.
+func get_command_description(command: String) -> String:
+	return get_command(command).get_description()
+
 ## Create and add a new console command.
-func create_command(command: String, callable: Callable, description := "") -> void:
+func create_command(command: String, callable: Callable, description: String = "") -> void:
 	assert(not has_command(command), "Has command.")
 	assert(is_valid_name(command), "Invalid command name.")
 	assert(callable.is_valid(), "Invalid callable.")
@@ -83,7 +87,7 @@ func execute(string: String) -> void:
 		print_line("[color=RED]Command \"" + string + "\" not found.[/color]")
 		return
 
-	var command := get_command(args[0])
+	var command: ConsoleCommand = get_command(args[0])
 
 	assert(is_instance_valid(command), "Invalid ConsoleCommand.")
 	if not is_instance_valid(command):
@@ -118,9 +122,10 @@ func autocomplete_command(string: String) -> String:
 	if string.is_empty():
 		return string
 
-	for command in get_command_list():
-		if command.begins_with(string):
-			return command
+	for cmd: String in get_command_list():
+		if cmd.begins_with(string):
+			# A space at the end of a line for convenience.
+			return cmd + " "
 
 	return string
 
@@ -131,9 +136,9 @@ func autocomplete_list(string: String) -> PackedStringArray:
 	if string.is_empty():
 		return list
 
-	for command in get_command_list():
-		if command.begins_with(string):
-			list.push_back(command)
+	for cmd: String in get_command_list():
+		if cmd.begins_with(string):
+			list.push_back(cmd)
 
 	return list
 
@@ -146,5 +151,11 @@ func clear() -> void:
 
 
 func _command_help() -> void:
-	for i in get_command_list():
-		print_line(i + "- " + get_command(i).get_description())
+	const TEMPLATE: String = "[cell][color=WHITE][url={0} ]{0}[/url][/color][/cell][cell][color=GRAY]{1}[/color][/cell]"
+
+	var output: String = "[table=2]"
+
+	for cmd: String in get_command_list():
+		output += TEMPLATE.format([cmd, get_command_description(cmd)])
+
+	print_line(output + "[/table]")
