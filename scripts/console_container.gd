@@ -57,10 +57,16 @@ func _init() -> void:
 
 
 func _enter_tree() -> void:
+	var error := visibility_changed.connect(_on_visibility_changed)
+	assert(error == OK, error_string(error))
+
 	set_console(get_node_or_null(^"/root/Console") as ConsoleNode)
 
 
 func _exit_tree() -> void:
+	if visibility_changed.is_connected(_on_visibility_changed):
+		visibility_changed.disconnect(_on_visibility_changed)
+
 	set_console(null)
 
 
@@ -96,6 +102,12 @@ func set_input_text(text: String) -> void:
 	_console_input.set_text(text)
 	_console_input.set_caret_column(text.length())
 	_console_input.text_changed.emit(text)
+
+
+func _on_visibility_changed() -> void:
+	if is_visible_in_tree():
+		_console_input.grab_focus()
+		_console_input.accept_event()
 
 
 func _on_input_text_changed(text: String) -> void:
