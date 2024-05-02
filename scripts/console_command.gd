@@ -17,7 +17,7 @@ var _arg_types : PackedInt32Array
 
 
 func _get_method_info(object: Object, method: String) -> Dictionary:
-	var script := object.get_script() as Script
+	var script: Script = object if object is Script else object.get_script()
 	if script:
 		for m in script.get_script_method_list():
 			if method == m["name"]:
