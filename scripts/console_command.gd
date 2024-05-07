@@ -14,6 +14,7 @@ var _method : StringName
 
 var _arg_names : PackedStringArray
 var _arg_types : PackedInt32Array
+var _default_args_count : int = 0
 
 
 func _get_method_info(object: Object, method: String) -> Dictionary:
@@ -44,6 +45,8 @@ func _init_arguments(object: Object, method: String) -> void:
 
 	error = _arg_types.resize(args.size())
 	assert(error == OK, error_string(error))
+
+	_default_args_count = Array(method_info["default_args"]).size()
 
 	for i in args.size():
 		var arg : Dictionary = args[i]
@@ -151,17 +154,20 @@ func execute(arguments: PackedStringArray) -> String:
 	if not is_valid():
 		return "[color=RED]Invalid object instance.[/color]"
 
-	if get_argument_count() != arguments.size():
-		return "[color=RED]Invalid argument count: Expected " + str(get_argument_count()) + ", received " + str(arguments.size()) + ".[/color]"
+	if arguments.size() > get_argument_count() or arguments.size() < get_argument_count() - _default_args_count:
+		if _default_args_count == 0:
+			return "[color=RED]Invalid argument count: Expected " + str(get_argument_count()) + ", received " + str(arguments.size()) + ".[/color]"
+		else:
+			return "[color=RED]Invalid argument count: Expected between " + str(get_argument_count() - _default_args_count) + " and " + str(get_argument_count()) + ", received " + str(arguments.size()) + ".[/color]"
 
 	var result: Variant = null
 	if has_argument():
 		var arg_array : Array = []
 
-		var error := arg_array.resize(get_argument_count())
+		var error := arg_array.resize(arguments.size())
 		assert(error == OK, error_string(error))
 
-		for i in get_argument_count():
+		for i in arguments.size():
 			var value = convert_string(arguments[i], get_argument_type(i))
 
 			if value == null:
