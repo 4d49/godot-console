@@ -1,3 +1,6 @@
+// Copyright (c) 2020-2024 Mansur Isaev and contributors - MIT License
+// See `LICENSE.md` included in the source distribution for details.
+
 using System;
 using System.Reflection.Metadata;
 using Godot;
