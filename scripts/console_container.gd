@@ -142,9 +142,9 @@ func _on_input_gui_event(event: InputEvent) -> void:
 		set_input_text(_console.get_prev_command())
 	elif event.is_action_pressed(&"ui_text_caret_down"):
 		set_input_text(_console.get_next_command())
-	elif event.is_action_pressed(&"ui_text_caret_right"):
+	elif event.is_action_pressed(&"ui_text_caret_right") and _tooltip_label.is_visible_in_tree():
 		_cycle_autocomplete(1)
-	elif event.is_action_pressed(&"ui_text_caret_left"):
+	elif event.is_action_pressed(&"ui_text_caret_left") and _tooltip_label.is_visible_in_tree():
 		_cycle_autocomplete(-1)
 	else:
 		return
