@@ -64,25 +64,17 @@ func add_money(value: int) -> String:
 
 You can add 'addons/godot-console/scripts/ConsoleMono.cs' to Autoloads after 'Console'.
 ```csharp
-public partial class test : Node
+public partial class Test : Node
 {
-
 	private void Foo(string a, string b)
 	{
 		ConsoleMono.Print(a + " " + b);
 	}
-	private static void Bar(string a, string b)
-	{
-		ConsoleMono.Print(b + " " + a);
-	}
 
 	public override void _Ready()
 	{
-		base._Ready();
-
-        	ConsoleMono.CreateCommand("foo", Foo); //You can pass method directly as delegate
-        	ConsoleMono.CreateCommand("foo2", this, MethodName.Foo); // Or you can pass target object and method name
-		//ConsoleMono.CreateCommand("bar", Bar); //Exception: method is static
+		ConsoleMono.CreateCommand("foo", Foo); // You can pass method directly as delegate.
+		ConsoleMono.CreateCommand("foo2", this, MethodName.Foo); // Or you can pass target object and method name.
 	}
 }
 ```
