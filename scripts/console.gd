@@ -118,35 +118,38 @@ func get_command_list() -> PackedStringArray:
 	return _command_list
 
 ## Return autocomplete command.
-func autocomplete_command(string: String, selected_index: int= -1) -> String:
+func autocomplete_command(string: String, selected_index: int = -1) -> String:
 	if string.is_empty():
 		return string
 
-	var i = 0
+	var i: int = 0
 	for cmd: String in get_command_list():
-		if cmd.begins_with(string):
-			if selected_index < 0 or i == selected_index:
-				# A space at the end of a line for convenience.
-				return cmd + " "
-			i += 1
+		if not cmd.begins_with(string):
+			continue
+		elif i == selected_index:
+			return cmd + " " # A space at the end of a line for convenience.
+
+		i += 1
 
 	return string
 
 ## Return a list of autocomplete commands.
 @warning_ignore("return_value_discarded")
-func autocomplete_list(string: String, selected_index: int= -1) -> PackedStringArray:
+func autocomplete_list(string: String, selected_index: int = -1) -> PackedStringArray:
 	var list := PackedStringArray()
 	if string.is_empty():
 		return list
 
-	var i = 0
+	var i: int = 0
 	for cmd: String in get_command_list():
-		if cmd.begins_with(string):
-			if i == selected_index:
-				list.push_back("*\t" + cmd)
-			else:
-				list.push_back("\t" + cmd)
-			i += 1
+		if not cmd.begins_with(string):
+			continue
+		elif i == selected_index:
+			list.push_back("*\t" + cmd)
+		else:
+			list.push_back("\t" + cmd)
+
+		i += 1
 
 	return list
 

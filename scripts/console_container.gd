@@ -126,10 +126,10 @@ func _on_input_text_changed(text: String) -> void:
 	_show_autocomplete(text)
 
 
-
 func _cycle_autocomplete(direction: int) -> void:
 	var autocomplete: PackedStringArray = _console.autocomplete_list(_console_input.get_text())
 	_autocomplete_index = wrapi(_autocomplete_index + direction, 0, autocomplete.size())
+
 	_show_autocomplete(_console_input.get_text())
 
 func _on_input_gui_event(event: InputEvent) -> void:
