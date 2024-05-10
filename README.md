@@ -14,7 +14,7 @@ Simple in-game console for Godot 4.x.
 
 # Installation:
 
-1. Clone this repository to `addons` folder.
+1. `git clone` this repository to the `addons` folder or download the latest [releases](https://github.com/4d49/godot-console/releases/latest/download/godot-console.zip).
 2. Enabled `Godot Console` in Plugins.
 3. Add `ConsoleContainer` node to the scene.
 4. Profit.
