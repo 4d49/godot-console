@@ -145,9 +145,9 @@ func autocomplete_list(string: String, selected_index: int = -1) -> PackedString
 		if not cmd.begins_with(string):
 			continue
 		elif i == selected_index:
-			list.push_back("*\t" + cmd)
+			list.push_back("[u]" + cmd + "[/u]")
 		else:
-			list.push_back("\t" + cmd)
+			list.push_back(cmd)
 
 		i += 1
 

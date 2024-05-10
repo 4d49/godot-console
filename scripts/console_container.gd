@@ -12,8 +12,7 @@ var _console : ConsoleNode
 var _console_output : RichTextLabel
 var _console_input : LineEdit
 
-var _tooltip_panel : PanelContainer
-var _tooltip_label : Label
+var _tooltip_label : RichTextLabel
 
 var _autocomplete_index: int = 0
 
@@ -45,29 +44,27 @@ func _init() -> void:
 
 	self.add_child(_console_input, false, Node.INTERNAL_MODE_FRONT)
 
-	_tooltip_panel = PanelContainer.new()
-	_tooltip_panel.set_theme_type_variation(&"TooltipPanel")
-	_tooltip_panel.set_v_grow_direction(Control.GROW_DIRECTION_BEGIN)
-	_tooltip_panel.set_offset(SIDE_LEFT, 4.0)
-	_tooltip_panel.set_offset(SIDE_BOTTOM, -4.0)
-	_tooltip_panel.hide()
-	_console_input.add_child(_tooltip_panel)
+	_tooltip_label = RichTextLabel.new()
+	_tooltip_label.set_theme_type_variation(&"TooltipPanel")
+	_tooltip_label.set_use_bbcode(true)
+	_tooltip_label.set_autowrap_mode(TextServer.AUTOWRAP_OFF)
+	_tooltip_label.set_fit_content(true)
+	_tooltip_label.set_v_grow_direction(Control.GROW_DIRECTION_BEGIN)
+	_tooltip_label.set_offset(SIDE_LEFT, 4.0)
+	_tooltip_label.set_offset(SIDE_BOTTOM, -4.0)
+	_tooltip_label.hide()
+	_console_input.add_child(_tooltip_label)
 
-	_tooltip_label = Label.new()
-	_tooltip_label.set_theme_type_variation(&"TooltipLabel")
-	_tooltip_panel.add_child(_tooltip_label)
 
 func _enter_tree() -> void:
 	var error := visibility_changed.connect(_on_visibility_changed)
 	assert(error == OK, error_string(error))
 
 	set_console(get_node_or_null(^"/root/Console") as ConsoleNode)
+	_tooltip_label.add_theme_stylebox_override(&"normal", get_theme_stylebox(&"panel", &"TooltipPanel"))
 
 
 func _exit_tree() -> void:
-	if visibility_changed.is_connected(_on_visibility_changed):
-		visibility_changed.disconnect(_on_visibility_changed)
-
 	set_console(null)
 
 
@@ -115,10 +112,10 @@ func _show_autocomplete(text: String) -> void:
 	var autocomplete := PackedStringArray() if text.is_empty() else _console.autocomplete_list(text, _autocomplete_index)
 
 	if autocomplete.is_empty():
-		_tooltip_panel.hide()
+		_tooltip_label.hide()
 	else:
 		_tooltip_label.set_text("\n".join(autocomplete))
-		_tooltip_panel.show()
+		_tooltip_label.show()
 
 
 func _on_input_text_changed(text: String) -> void:
@@ -134,7 +131,7 @@ func _cycle_autocomplete(direction: int) -> void:
 
 func _on_input_gui_event(event: InputEvent) -> void:
 	if event.is_action_pressed(&"ui_text_completion_accept"):
-		if _tooltip_panel.is_visible_in_tree():
+		if _tooltip_label.is_visible_in_tree():
 			set_input_text(_console.autocomplete_command(_console_input.text, _autocomplete_index))
 		else:
 			_console.execute(_console_input.text)
