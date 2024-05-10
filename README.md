@@ -14,7 +14,7 @@ Simple in-game console for Godot 4.x.
 
 # Installation:
 
-1. Clone this repository to `addons` folder.
+1. `git clone` this repository to the `addons` folder or download the latest [releases](https://github.com/4d49/godot-console/releases/latest/download/godot-console.zip).
 2. Enabled `Godot Console` in Plugins.
 3. Add `ConsoleContainer` node to the scene.
 4. Profit.
@@ -64,32 +64,24 @@ func add_money(value: int) -> String:
 
 You can add 'addons/godot-console/scripts/ConsoleMono.cs' to Autoloads after 'Console'.
 ```csharp
-public partial class test : Node
+public partial class Test : Node
 {
-
 	private void Foo(string a, string b)
 	{
 		ConsoleMono.Print(a + " " + b);
 	}
-	private static void Bar(string a, string b)
-	{
-		ConsoleMono.Print(b + " " + a);
-	}
 
 	public override void _Ready()
 	{
-		base._Ready();
-
-        	ConsoleMono.CreateCommand("foo", Foo); //You can pass method directly as delegate
-        	ConsoleMono.CreateCommand("foo2", this, MethodName.Foo); // Or you can pass target object and method name
-		//ConsoleMono.CreateCommand("bar", Bar); //Exception: method is static
+		ConsoleMono.CreateCommand("foo", Foo); // You can pass method directly as delegate.
+		ConsoleMono.CreateCommand("foo2", this, MethodName.Foo); // Or you can pass target object and method name.
 	}
 }
 ```
 
 # License
 
-Copyright (c) 2020-2022 Mansur Isaev and contributors
+Copyright (c) 2020-2024 Mansur Isaev and contributors
 
 Unless otherwise specified, files in this repository are licensed under the
 MIT license. See [LICENSE.md](LICENSE.md) for more information.
