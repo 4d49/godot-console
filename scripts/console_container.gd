@@ -14,7 +14,10 @@ var _console_input : LineEdit
 
 var _tooltip_label : RichTextLabel
 
-var _autocomplete_index: int = 0
+# Cycle through the autocomplete options. negative value indicates no selection.
+var _autocomplete_index: int = -1
+# Preserve the original input text when cycling through options.
+var _autocomplete_prompt: String = ""
 
 
 func _init() -> void:
@@ -117,35 +120,33 @@ func _show_autocomplete(text: String) -> void:
 		_tooltip_label.set_text("\n".join(autocomplete))
 		_tooltip_label.show()
 
-
 func _on_input_text_changed(text: String) -> void:
-	_autocomplete_index = 0
-	_show_autocomplete(text)
-
+	_show_autocomplete(text if _autocomplete_prompt.is_empty() else _autocomplete_prompt)
 
 func _cycle_autocomplete(direction: int) -> void:
-	var autocomplete: PackedStringArray = _console.autocomplete_list(_console_input.get_text())
+	var autocomplete: PackedStringArray = _console.autocomplete_list(_autocomplete_prompt)
 	_autocomplete_index = wrapi(_autocomplete_index + direction, 0, autocomplete.size())
-
-	_show_autocomplete(_console_input.get_text())
+	set_input_text(_console.autocomplete_command(_autocomplete_prompt, _autocomplete_index))
 
 func _on_input_gui_event(event: InputEvent) -> void:
+	if event.is_action_type() and not event.is_action(&"ui_text_indent"):
+		# Start below zero so the first tab press "selects" the autocomplete.
+		_autocomplete_index = -1
+		_autocomplete_prompt = ""
+		_show_autocomplete(_console_input.text)
+
 	if event.is_action_pressed(&"ui_text_completion_accept"):
-		if _tooltip_label.is_visible_in_tree():
-			set_input_text(_console.autocomplete_command(_console_input.text, _autocomplete_index))
-		else:
-			_console.execute(_console_input.text)
-			_console_input.clear()
+		_console.execute(_console_input.text)
+		_console_input.clear()
 	elif event.is_action_pressed(&"ui_text_indent"):
+		if _autocomplete_prompt.is_empty():
+			_autocomplete_prompt = _console_input.text
+
 		_cycle_autocomplete(-1 if Input.is_key_pressed(KEY_SHIFT) else 1)
 	elif event.is_action_pressed(&"ui_text_caret_up"):
 		set_input_text(_console.get_prev_command())
 	elif event.is_action_pressed(&"ui_text_caret_down"):
 		set_input_text(_console.get_next_command())
-	elif event.is_action_pressed(&"ui_text_caret_right") and _tooltip_label.is_visible_in_tree():
-		_cycle_autocomplete(1)
-	elif event.is_action_pressed(&"ui_text_caret_left") and _tooltip_label.is_visible_in_tree():
-		_cycle_autocomplete(-1)
 	else:
 		return
 
