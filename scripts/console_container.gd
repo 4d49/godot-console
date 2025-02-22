@@ -135,7 +135,7 @@ func _on_input_gui_event(event: InputEvent) -> void:
 		_autocomplete_prompt = ""
 		_show_autocomplete(_console_input.text)
 
-	if event.is_action_pressed(&"ui_text_completion_accept"):
+	if event.is_action_pressed(&"ui_text_submit"):
 		_console.execute(_console_input.text)
 		_console_input.clear()
 	elif event.is_action_pressed(&"ui_text_indent"):
@@ -151,4 +151,3 @@ func _on_input_gui_event(event: InputEvent) -> void:
 		return
 
 	_console_input.accept_event()
-
