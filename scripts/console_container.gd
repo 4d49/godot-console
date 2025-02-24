@@ -3,8 +3,10 @@
 
 @tool
 ## Default container for Console output/input.
-class_name ConsoleContainer
 extends VBoxContainer
+
+
+const ConsoleNode: GDScript = preload("res://addons/godot-console/scripts/console.gd")
 
 
 var _console : ConsoleNode

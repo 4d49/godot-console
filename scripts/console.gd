@@ -4,8 +4,11 @@
 ## ConsoleNode class.
 ##
 ## By default used as a Singleton. To create a new console command, use [method create_command].
-class_name ConsoleNode
 extends Node
+
+
+const ConsoleCommand: GDScript = preload("res://addons/godot-console/scripts/console_command.gd")
+
 
 ## Emitted when the console prints a string.
 signal printed_line(string: String)
