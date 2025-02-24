@@ -2,7 +2,6 @@
 # See `LICENSE.md` included in the source distribution for details.
 
 ## Base ConsoleCommand class.
-class_name ConsoleCommand
 extends RefCounted
 
 
