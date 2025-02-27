@@ -6,10 +6,6 @@
 ## By default used as a Singleton. To create a new console command, use [method create_command].
 extends Node
 
-
-const ConsoleCommand: GDScript = preload("res://addons/godot-console/scripts/console_command.gd")
-
-
 ## Emitted when the console prints a string.
 signal printed_line(string: String)
 ## Emitted when the console history is cleared.
