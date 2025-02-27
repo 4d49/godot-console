@@ -74,7 +74,7 @@ func create_command(command_name: String, callable: Callable, description: Strin
 
 
 ## Print string to the console.
-func print_line(string: String) -> void:
+func print(string: String) -> void:
 	printed_line.emit(string + "\n")
 
 func validate_argument_count(args: PackedStringArray, cmd: Dictionary) -> bool:
@@ -88,7 +88,7 @@ func validate_argument_count(args: PackedStringArray, cmd: Dictionary) -> bool:
 		else:
 			error_message = "[color=RED]Invalid argument count: Expected %d, received %d.[/color]" % [expected_max, args.size()]
 
-		print_line(error_message)
+		self.print(error_message)
 		return false
 
 	return true
@@ -102,14 +102,14 @@ func execute(string: String) -> void:
 	_history.push_back(string)
 	_history_index = _history.size()
 
-	print_line("[color=GRAY]> " + string + "[/color]")
+	self.print("[color=GRAY]> " + string + "[/color]")
 
 	if not has_command(args[0]):
-		return print_line("[color=RED]Command \"" + string + "\" not found.[/color]")
+		return self.print("[color=RED]Command \"" + string + "\" not found.[/color]")
 
 	var cmd: Dictionary = _commands[args[0]]
 	if not is_instance_id_valid(cmd.object_id):
-		return print_line("[color=RED]Invalid object instance.[/color]")
+		return self.print("[color=RED]Invalid object instance.[/color]")
 
 	args.remove_at(0) # Remove command name from arguments.
 	if not validate_argument_count(args, cmd):
@@ -123,7 +123,7 @@ func execute(string: String) -> void:
 		for i: int in args.size():
 			var value: Variant = convert_string(args[i], cmd.arg_types[i])
 			if value == null:
-				return print_line("[color=YELLOW]Invalid argument type: Cannot convert argument " + str(i + 1) + " from \"String\" to \"" + type_string(cmd.arg_types[i]) + "\".[/color]")
+				return self.print("[color=YELLOW]Invalid argument type: Cannot convert argument " + str(i + 1) + " from \"String\" to \"" + type_string(cmd.arg_types[i]) + "\".[/color]")
 
 			arg_array[i] = value
 
@@ -132,7 +132,7 @@ func execute(string: String) -> void:
 		result = instance_from_id(cmd.object_id).call(cmd.method)
 
 	if result is String:
-		print_line(result)
+		self.print(result)
 
 ## Return the previously entered command.
 func get_prev_command() -> String:
@@ -203,7 +203,7 @@ func _command_help() -> void:
 	for cmd: String in get_command_list():
 		output += TEMPLATE.format([cmd, get_command_description(cmd)])
 
-	print_line(output + "[/table]")
+	self.print(output + "[/table]")
 
 
 
