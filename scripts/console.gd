@@ -72,10 +72,18 @@ func create_command(command_name: String, callable: Callable, description: Strin
 	_commands[command_name] = command
 	_command_list.clear()
 
-
 ## Print string to the console.
 func print(string: String) -> void:
 	printed_line.emit(string + "\n")
+
+## Print warning message to the console.
+func warning(string: String) -> void:
+	printed_line.emit("[color=YELLOW]" + string + "[/color]\n")
+
+## Print error message to the console.
+func error(string: String) -> void:
+	printed_line.emit("[color=RED]" + string + "[/color]\n")
+
 
 func validate_argument_count(args: PackedStringArray, cmd: Dictionary) -> bool:
 	var expected_max: int = len(cmd.arg_types)
@@ -84,11 +92,11 @@ func validate_argument_count(args: PackedStringArray, cmd: Dictionary) -> bool:
 	if args.size() < expected_min or args.size() > expected_max:
 		var error_message: String = ""
 		if cmd.default_args:
-			error_message = "[color=RED]Invalid argument count: Expected between %d and %d, received %d.[/color]" % [expected_min, expected_max, args.size()]
+			error_message = "Invalid argument count: Expected between %d and %d, received %d." % [expected_min, expected_max, args.size()]
 		else:
-			error_message = "[color=RED]Invalid argument count: Expected %d, received %d.[/color]" % [expected_max, args.size()]
+			error_message = "Invalid argument count: Expected %d, received %d." % [expected_max, args.size()]
 
-		self.print(error_message)
+		self.error(error_message)
 		return false
 
 	return true
@@ -105,11 +113,11 @@ func execute(string: String) -> void:
 	self.print("[color=GRAY]> " + string + "[/color]")
 
 	if not has_command(args[0]):
-		return self.print("[color=RED]Command \"" + string + "\" not found.[/color]")
+		return self.error("Command '%s' not found." % string)
 
 	var cmd: Dictionary = _commands[args[0]]
 	if not is_instance_id_valid(cmd.object_id):
-		return self.print("[color=RED]Invalid object instance.[/color]")
+		return self.error("Invalid object instance.")
 
 	args.remove_at(0) # Remove command name from arguments.
 	if not validate_argument_count(args, cmd):
@@ -123,7 +131,7 @@ func execute(string: String) -> void:
 		for i: int in args.size():
 			var value: Variant = convert_string(args[i], cmd.arg_types[i])
 			if value == null:
-				return self.print("[color=YELLOW]Invalid argument type: Cannot convert argument " + str(i + 1) + " from \"String\" to \"" + type_string(cmd.arg_types[i]) + "\".[/color]")
+				return self.error("Invalid argument type: Cannot convert argument %d from 'String' to '%s'." % [i, type_string(cmd.arg_types[i])])
 
 			arg_array[i] = value
 
