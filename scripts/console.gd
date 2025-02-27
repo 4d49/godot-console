@@ -29,7 +29,7 @@ func has_command(command: String) -> bool:
 
 ## Return [param true] if command name is valid.
 func is_valid_name(command: String) -> bool:
-	return command.is_valid_identifier()
+	return command.is_valid_ascii_identifier()
 
 ## Add a command to the console.
 ## Can be used to directly add a custom command.
