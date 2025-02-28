@@ -12,7 +12,7 @@ signal printed_line(string: String)
 signal cleared()
 
 
-var _commands: Dictionary[String, Dictionary] = {}
+var _commands: Dictionary[StringName, Dictionary] = {}
 var _command_list: PackedStringArray = PackedStringArray()
 
 var _history : PackedStringArray
@@ -24,24 +24,24 @@ func _init() -> void:
 	create_command("help", _command_help, "Show all console command.")
 
 ## Return [param true] if the console has a command.
-func has_command(command: String) -> bool:
+func has_command(command: StringName) -> bool:
 	return _commands.has(command)
 
 ## Return [param true] if command name is valid.
-func is_valid_name(command: String) -> bool:
+func is_valid_name(command: StringName) -> bool:
 	return command.is_valid_ascii_identifier()
 
 ## Remove a command from the console.
-func remove_command(command: String) -> void:
+func remove_command(command: StringName) -> void:
 	if _commands.erase(command):
 		_command_list.clear()
 
 ## Return command description.
-func get_command_description(command: String) -> String:
+func get_command_description(command: StringName) -> String:
 	return _commands[command][&"description"] if _commands.has(command) else ""
 
 ## Create and add a new console command.
-func create_command(command_name: String, callable: Callable, description: String = "") -> void:
+func create_command(command_name: StringName, callable: Callable, description: String = "") -> void:
 	assert(not has_command(command_name), "Command '%s' already exists." % command_name)
 	assert(is_valid_name(command_name), "Invalid command name: '%s'." % command_name)
 	assert(callable.is_valid(), "Invalid Callable for command '%s'." % command_name)
