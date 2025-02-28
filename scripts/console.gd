@@ -47,16 +47,12 @@ func create_command(command_name: String, callable: Callable, description: Strin
 	assert(callable.is_valid(), "Invalid Callable for command '%s'." % command_name)
 
 	var method_info: Dictionary = object_find_method_info(callable.get_object(), callable.get_method())
-	if method_info.is_empty():
-		return push_error("Method '%s' not found for command '%s'." % [callable.get_method(), command_name])
-
-	var args: Array = method_info.args
-	if not is_valid_args(args):
-		return push_error("Unsupported argument types in method '%s'." % callable.get_method())
+	assert(method_info, "Method '%s' not found for command '%s'." % [callable.get_method(), command_name])
+	assert(is_valid_args(method_info.args), "Unsupported argument types in method '%s'." % callable.get_method())
 
 	var arg_names: PackedStringArray = PackedStringArray()
 	var arg_types: PackedInt32Array = PackedInt32Array()
-	init_arg_types_and_names(args, arg_types, arg_names)
+	init_arg_types_and_names(method_info.args, arg_types, arg_names)
 
 	var command: Dictionary[StringName, Variant] = {
 		&"name": command_name,
@@ -212,7 +208,6 @@ func _command_help() -> void:
 		output += TEMPLATE.format([cmd, get_command_description(cmd)])
 
 	self.print(output + "[/table]")
-
 
 
 
