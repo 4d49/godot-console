@@ -45,6 +45,7 @@ func create_command(command_name: String, callable: Callable, description: Strin
 	assert(not has_command(command_name), "Command '%s' already exists." % command_name)
 	assert(is_valid_name(command_name), "Invalid command name: '%s'." % command_name)
 	assert(callable.is_valid(), "Invalid Callable for command '%s'." % command_name)
+	assert(callable.is_standard(), "Custom Callable is not supported.")
 
 	var method_info: Dictionary = object_find_method_info(callable.get_object(), callable.get_method())
 	assert(method_info, "Method '%s' not found for command '%s'." % [callable.get_method(), command_name])
