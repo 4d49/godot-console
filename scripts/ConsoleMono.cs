@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2024 Mansur Isaev and contributors - MIT License
+// Copyright (c) 2020-2025 Mansur Isaev and contributors - MIT License
 // See `LICENSE.md` included in the source distribution for details.
 
 using System;
@@ -17,9 +17,9 @@ public partial class ConsoleMono : Node
 	{
 		return (bool)_console.Call("has_command", command);
 	}
-	public static bool RemoveCommand(StringName command)
+	public static void RemoveCommand(StringName command)
 	{
-		return (bool)_console.Call("remove_command", command);
+		_console.Call("remove_command", command);
 	}
 
 	public static string GetCommandDescription(StringName command)
@@ -41,7 +41,15 @@ public partial class ConsoleMono : Node
 
 	public static void Print(string str)
 	{
-		_console.Call("print_line", str);
+		_console.Call("print", str);
+	}
+	public static void Warning(string str)
+	{
+		_console.Call("warning", str);
+	}
+	public static void Error(string str)
+	{
+		_console.Call("error", str);
 	}
 
 	public static void Execute(string str)
