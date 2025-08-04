@@ -4,82 +4,110 @@ Simple in-game console for Godot 4.x.
 
 ![](https://user-images.githubusercontent.com/8208165/144989905-6d3eb45d-26e7-4acd-9a53-c31d7e49c400.png)
 
-# Features
+## Features
 
-- Installed as plugin.
-- The Console is Singleton.
-- History of entered commands.
-- Autocomplete commands.
-- Static typing.
+- Installed as plugin
+- Singleton implementation
+- Command history navigation (Up/Down keys)
+- Tab-based command autocompletion
+- Argument type conversion for static typing
+- Built-in `clear` and `help` commands
+- C# support via bindings
+- Rich text formatting support
 
-# Installation:
+## Installation
 
-1. `git clone` this repository to the `addons` folder or download the latest [releases](https://github.com/4d49/godot-console/releases/latest/download/godot-console.zip).
-2. Enabled `Godot Console` in Plugins.
-3. Add `ConsoleContainer` node to the scene.
-4. Profit.
+1. Clone this repository to your project's `addons` folder:
+   ```bash
+   git clone https://github.com/4d49/godot-console.git
+   ```
+   Or download the latest [release](https://github.com/4d49/godot-console/releases/latest/download/godot-console.zip)
+2. Enable the plugin in Godot: **Project Settings → Plugins → Enable `Godot Console`**
+3. Add the `ConsoleContainer` node to your main scene
 
-# Usage:
+## Usage
 
-## Create console command:
+### Creating Commands
+Register commands using `Console.create_command()`:
 
 ```gdscript
 # player.gd
 func teleport(x: float, y: float) -> void:
-	self.position = Vector2(x, y)
+    position = Vector2(x, y)
 
 func _ready() -> void:
-	Console.create_command("tp", self.teleport, "Teleport the player.")
+    # Register command: name, callback, description
+    Console.create_command("tp", teleport, "Teleport player to coordinates")
 ```
 
-## Static typing:
+### Static Typing
+Arguments are automatically converted to specified types:
 
-With static typing, Console will try to cast arguments to a supported type.
 ```gdscript
-# Arguments are float.
+# Arguments auto-converted to float
 func teleport(x: float, y: float) -> void:
-	self.position = Vector2(x, y)
+    position = Vector2(x, y)
 ```
 
-## Dynamic typing:
+**Supported Types:** `bool`, `int`, `float`, `String`, `StringName`
 
-With dynamic typing, Console will NOT cast arguments to type, and arguments will be a String.
+### Dynamic Typing
+Arguments are passed as raw strings:
+
 ```gdscript
-# Arguments are Strings.
+# Arguments received as Strings
 func teleport(x, y):
-	# Convert arguments to float.
-	self.position = Vector2(x.to_float(), y.to_float())
+    position = Vector2(x.to_float(), y.to_float())
 ```
 
-## Optional return string for print result to the console.
+### Returning Results
+Return a String to display results in console:
 
 ```gdscript
-func add_money(value: int) -> String:
-	self.money += value
-	# Prints: Player money:42
-	return "Player money:%d" % money
+func add_money(amount: int) -> String:
+    money += amount
+    return "Added money: %d (Total: %d)" % [amount, money]
 ```
 
-## C# Bindings:
+### Navigation
+- **Up/Down arrows**: Browse command history
+- **Shift + Tab**: Autocomplete commands
+- **Enter**: Execute command
 
-You can add 'addons/godot-console/scripts/ConsoleMono.cs' to Autoloads after 'Console'.
+## C# Bindings
+Add `addons/godot-console/scripts/ConsoleMono.cs` to Autoloads after `Console`.
+
 ```csharp
-public partial class Test : Node
+public partial class Player : CharacterBody2D
 {
-	private void Foo(string a, string b)
-	{
-		ConsoleMono.Print(a + " " + b);
-	}
+    private void Teleport(float x, float y)
+    {
+        Position = new Vector2(x, y);
+    }
 
-	public override void _Ready()
-	{
-		ConsoleMono.CreateCommand("foo", Foo); // You can pass method directly as delegate.
-		ConsoleMono.CreateCommand("foo2", this, MethodName.Foo); // Or you can pass target object and method name.
-	}
+    public override void _Ready()
+    {
+        // Register command directly
+        ConsoleMono.CreateCommand("tp", Teleport);
+
+        // Alternative registration
+        ConsoleMono.CreateCommand("teleport", this, MethodName.Teleport);
+    }
 }
 ```
 
-# License
+## Best Practices
+1. Use explicit type hints for arguments
+2. Validate user input in command handlers
+3. Return meaningful success/error messages
+4. Keep command names short and descriptive
+5. Use `warning()`/`error()` for status messages:
+   ```gdscript
+   Console.warning("Low health!")
+   Console.error("Invalid coordinates!")
+   ```
+
+## License
 
 Copyright (c) 2020-2025 Mansur Isaev and contributors
 
